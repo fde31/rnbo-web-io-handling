@@ -26,6 +26,36 @@ async function loadDevice(url, context) {
 	return await RNBO.createDevice({ patcher, context });
 }
 
+function createNodeInfo(node, title) {
+	const info = document.createElement("div");
+	const header = document.createElement("h3");
+	header.innerText = title;
+	info.appendChild(header);
+
+	const data = [
+		["node.numberOfInputs", node.numberOfInputs],
+		["node.numberOfOutputs", node.numberOfOutputs],
+		["node.channelCount", node.channelCount]
+	];
+	for (const [label, value] of data) {
+		const infoRow = document.createElement("div");
+		
+		const infoLabel = document.createElement("label");
+		infoLabel.innerText = label;
+		infoRow.appendChild(infoLabel);
+
+		const infoValue = document.createElement("input");
+		infoValue.type = "text";
+		infoValue.value = value;
+		infoValue.disabled = true;
+		infoRow.appendChild(infoValue);
+		info.appendChild(infoRow);
+	}
+
+	return info;
+}
+
+
 function createDeviceInfo(device, title) {
 	const info = document.createElement("div");
 	const header = document.createElement("h3");
@@ -99,17 +129,26 @@ async function main () {
 	context.destination.channelCountMode = "explicit";
 	context.destination.channelInterpretation = "discrete";
 
-	let cycleDevice, passthroughDevice;
+	let cycleWorklet, passthroughDevice;
 	try {
-		cycleDevice = await loadDevice("/export/cycles.export.json", context);
 		passthroughDevice = await loadDevice("/export/passthrough.export.json", context);
+		await context.audioWorklet.addModule("/js/multisine.js?check=10");
+    cycleWorklet = new AudioWorkletNode(
+      context,
+      "multi-sine",
+      {
+        numberOfInputs: 0,
+        numberOfOutputs: 1,
+        outputChannelCount: [passthroughDevice.numInputChannels]
+      }
+    );
 	} catch (err) {
 		return showError("Failed to create device from exported patcher", err);
 	}
 
 	// Display info
 	const infoSection = document.getElementById("io-info-display");
-	infoSection.appendChild(createDeviceInfo(cycleDevice, "cycles"));
+	infoSection.appendChild(createNodeInfo(cycleWorklet, "cycles"));
 	infoSection.appendChild(createDeviceInfo(passthroughDevice, "passthrough"));
 
 	// Set Up Parameters for per-channel gain control
@@ -142,7 +181,7 @@ async function main () {
 	// Context Resume Handler
 	document.querySelector("#resume").onclick = () => context.state === "suspended" && context.resume();
 
-	cycleDevice.node.connect(passthroughDevice.node);
+	cycleWorklet.connect(passthroughDevice.node);
 
 	// Run Peak Volume Analyser using a channel splitter and draw some very simple meters per-channel
 	const channelSplitter = context.createChannelSplitter(passthroughDevice.numOutputChannels);
