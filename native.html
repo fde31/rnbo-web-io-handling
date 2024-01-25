@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="theme-color" content="#000000">
+		<title>AudioWorklets MultiChannel</title>
+		<style>
+			#error-display {
+				background-color: rgba(250,82,82,.1);
+				border-radius: 5px;
+				color: #fa5252;
+				display: none;
+				max-width: 100%;
+				padding: 0.5rem 1rem;
+				margin: 0.5rem 0;
+				width: 300px;
+			}
+
+			h5 {
+				margin: 1rem 0 0.2rem 0;
+			}
+
+			#io-info-display,
+			#sliders,
+			#output-select {
+				display: flex;
+				gap: 2rem;
+			}
+			
+			label {
+				display: block;
+				font-weight: bold;
+				margin: 0.5rem 0;
+			}
+
+			#meter {
+				background-color: #333;
+				display: flex;
+				gap: 5px;
+				padding: 5px;
+				height: 20rem;
+				margin: 2rem 0;
+				width: fit-content;
+			}
+
+			.channel-meter {
+				background: linear-gradient(#fa5252 1%, rgb(255, 255, 0) 16%, lime 45%, rgb(0, 136, 0) 100%);
+				clip-path: inset(100% 0px 0px);
+				height: 100%;
+				transition: clip-path 0.1s ease 0s;
+				width: 30px;
+			}
+
+		</style>
+</head>
+
+<body>
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<button id="resume">Start Audio</button>
+		<div id="error-display">
+			<h3>Error</h3>
+		</div>
+		<h2>I/O Info</h2>
+		<div id="io-info-display">
+		</div>
+		<h2>Channel Gain</h2>
+		<i>Adjust the gain of each output channel of the passthrough Worklet.</i>
+		<div id="sliders">
+		</div>
+		<div id="meter"></div>
+		<h2>Output Select</h2>
+		<i>Select which output channel of the passthrough Worklet to listen to on a stereo output.</i>
+		<div id="output-select"></div>
+
+		<script type="text/javascript" src="./js/native_app.js"></script>
+</body>
+</html>
