@@ -110,7 +110,7 @@ async function main () {
 	// Display info
 	const infoSection = document.getElementById("io-info-display");
 	infoSection.appendChild(createDeviceInfo(cycleDevice, "cycles"));
-	infoSection.appendChild(createDeviceInfo(cycleDevice, "passthrough"));
+	infoSection.appendChild(createDeviceInfo(passthroughDevice, "passthrough"));
 
 	// Set Up Parameters for per-channel gain control
 	const sliderSection = document.getElementById("sliders");
@@ -142,7 +142,7 @@ async function main () {
 	// Context Resume Handler
 	document.querySelector("#resume").onclick = () => context.state === "suspended" && context.resume();
 
-	cycleDevice.node.connect(passthroughDevice.node, 0, 0);
+	cycleDevice.node.connect(passthroughDevice.node);
 
 	// Run Peak Volume Analyser using a channel splitter and draw some very simple meters per-channel
 	const channelSplitter = context.createChannelSplitter(passthroughDevice.numOutputChannels);
